@@ -7,10 +7,10 @@ Each caller logs in with their own username and password and sees their own list
 1. **Put the code on GitHub.** Create a new private repository and upload the contents of this folder (everything except `node_modules`).
 2. **Import it into Vercel.** Go to vercel.com → *Add New… → Project*, pick the repository, and click *Deploy*. Leave the framework set to Next.js. The first deploy will fail or show an error page because there's no database yet. That's expected.
 3. **Add the database.** In the project, open *Storage → Create Database → Upstash (Redis)*, choose the free plan and a region near you (Mumbai if it's offered), and connect it to this project. This adds `KV_REST_API_URL` and `KV_REST_API_TOKEN` automatically.
-4. **Add three environment variables** under *Settings → Environment Variables*:
+4. **Add environment variables** under *Settings → Environment Variables*:
    - `ADMIN_USERNAME`: the organiser's login, e.g. `organiser`
    - `ADMIN_PASSWORD`: a long password only you know
-   - `SESSION_SECRET`: a long random string (for example, run `openssl rand -hex 32`, or mash the keyboard for 40+ characters)
+   - `SESSION_SECRET` (optional): a long random string. If it's not set, one is derived from the admin password and the database token.
 5. **Redeploy** (*Deployments → ⋯ → Redeploy*) so it picks up the new settings.
 
 ## First-time setup (organiser)
