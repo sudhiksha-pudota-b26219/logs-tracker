@@ -17,7 +17,7 @@ Each caller logs in with their own username and password and sees their own list
 
 1. Open your Vercel URL and log in with `ADMIN_USERNAME` / `ADMIN_PASSWORD`.
 2. Click **Setup & logins**.
-3. Paste the 14 callers' names, one per line, and click **Create logins**. Copy the usernames and passwords it shows and send each person theirs. They're shown only once. If someone loses theirs, use **New password**.
+3. Add the 14 callers, one per line, as `Name, password` (or just `Name` to have a password generated), and click **Create logins**. Copy the usernames and passwords it shows and send each person theirs, because they're shown only once. To change someone's password later, click **Change password** next to their name and type the new one, or leave it blank to generate one. If someone loses theirs, use **Change password**.
 4. **Before the real list arrives:** click **Load practice list** to give everyone made-up names (Practice Student 001, roll P001…) to try the buttons on. Callers see a "Practice list" banner.
 5. **When the real list arrives:** paste it in as `Name, roll number` per line, or as two columns copied from a spreadsheet in either order. Untick **This is still a practice list** and click **Divide evenly & save**. This replaces the practice list.
 6. **To edit later:** click **Edit current list**, change the lines and save. The list is divided evenly again, and anyone already marked keeps their status as long as their roll number hasn't changed.

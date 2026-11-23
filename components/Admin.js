@@ -1,5 +1,5 @@
 'use client';
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 
 const post = async (url, body) => {
   const r = await fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) });
@@ -30,6 +30,8 @@ export default function Admin() {
   const [practiceN, setPracticeN] = useState(196);
   const [practiceOn, setPracticeOn] = useState(false);
   const [creds, setCreds] = useState([]);
+  const [pwFor, setPwFor] = useState(null);
+  const [pwValue, setPwValue] = useState('');
   const [msg, setMsg] = useState('');
   const [busy, setBusy] = useState('');
 
@@ -48,7 +50,12 @@ export default function Admin() {
     setBusy(''); load();
   };
 
-  const nameList = names.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  // "Name" or "Name, password" per line (a tab also works, for pasting from a spreadsheet).
+  const nameList = names.split(/\r?\n/).map((l) => l.trim()).filter(Boolean).map((l) => {
+    const i = l.search(/[,\t]/);
+    return i < 0 ? { name: l, password: '' } : { name: l.slice(0, i).trim(), password: l.slice(i + 1).trim() };
+  });
+  const shortPw = nameList.find((n) => n.password && n.password.length < 4);
   const peopleList = parsePeople(people);
   const totalPeople = callers.reduce((a, c) => a + c.contacts.length, 0);
   const each = callers.length ? Math.floor(peopleList.length / callers.length) : 0;
@@ -71,39 +78,53 @@ export default function Admin() {
               <thead><tr><th>Name</th><th>Username</th><th style={{ textAlign: 'right' }}>People</th><th></th></tr></thead>
               <tbody>
                 {callers.map((c) => (
-                  <tr key={c.username}>
+                  <Fragment key={c.username}>
+                  <tr>
                     <td>{c.name}</td><td>{c.username}</td><td className="num">{c.contacts.length}</td>
                     <td style={{ textAlign: 'right', whiteSpace: 'nowrap' }}>
-                      <button className="btn small" type="button" disabled={!!busy} onClick={() => run('rp' + c.username, async () => {
-                        if (!window.confirm(`Make a new password for ${c.name}? Their old one will stop working.`)) return;
-                        const j = await post('/api/admin/reset-password', { username: c.username });
-                        setCreds([j]);
-                      })}>New password</button>{' '}
+                      <button className="btn small" type="button" disabled={!!busy} onClick={() => { setPwFor(pwFor === c.username ? null : c.username); setPwValue(''); }}>Change password</button>{' '}
                       <button className="btn small danger" type="button" disabled={!!busy} onClick={() => run('rm' + c.username, async () => {
                         if (!window.confirm(`Remove ${c.name}? Their login and their list of ${c.contacts.length} people will be deleted. Divide the people again afterwards.`)) return;
                         await post('/api/admin/remove', { username: c.username });
                       })}>Remove</button>
                     </td>
                   </tr>
+                  {pwFor === c.username && (
+                    <tr key={c.username + '-pw'}>
+                      <td colSpan={4} style={{ background: 'var(--bg)' }}>
+                        <form className="tools" style={{ margin: 0 }} onSubmit={(e) => { e.preventDefault(); run('rp' + c.username, async () => {
+                          const j = await post('/api/admin/reset-password', { username: c.username, password: pwValue });
+                          setCreds([j]); setPwFor(null); setPwValue('');
+                        }); }}>
+                          <label htmlFor={'pw-' + c.username} style={{ margin: 0 }}>New password for {c.name}</label>
+                          <input id={'pw-' + c.username} type="text" autoComplete="off" style={{ width: 200 }} value={pwValue} onChange={(e) => setPwValue(e.target.value)} placeholder="Leave blank to generate" />
+                          <button className="btn small primary" type="submit" disabled={!!busy || (pwValue.trim() && pwValue.trim().length < 4)}>Save</button>
+                          <button className="btn small" type="button" onClick={() => setPwFor(null)}>Cancel</button>
+                          <span className="hint">At least 4 characters. Their old password stops working.</span>
+                        </form>
+                      </td>
+                    </tr>
+                  )}
+                  </Fragment>
                 ))}
               </tbody>
             </table>
           </div>
         ) : <p className="hint">No callers yet.</p>}
         <div style={{ marginTop: 16 }}>
-          <label htmlFor="names">Add callers — one name per line</label>
-          <textarea id="names" style={{ minHeight: 140 }} value={names} onChange={(e) => setNames(e.target.value)} placeholder={'Asha Menon\nRahul Verma\nMeera Iyer'} />
+          <label htmlFor="names">Add callers — one per line: name, password (leave the password off to generate one)</label>
+          <textarea id="names" style={{ minHeight: 140 }} value={names} onChange={(e) => setNames(e.target.value)} placeholder={'Asha Menon, sunrise24\nRahul Verma, tiger81\nMeera Iyer'} />
           <div className="tools">
-            <button className="btn primary" type="button" disabled={!nameList.length || !!busy} onClick={() => run('add', async () => {
+            <button className="btn primary" type="button" disabled={!nameList.length || !!shortPw || !!busy} onClick={() => run('add', async () => {
               const j = await post('/api/admin/callers', { names: nameList });
               setCreds(j.created); setNames('');
             })}>{busy === 'add' ? 'Creating…' : `Create ${nameList.length || ''} login${nameList.length === 1 ? '' : 's'}`}</button>
-            <span className="hint">Usernames come from first names; passwords are generated.</span>
+            <span className="hint">{shortPw ? <span className="err">{shortPw.name}’s password needs at least 4 characters.</span> : 'Usernames come from first names. Put a comma between the name and the password.'}</span>
           </div>
         </div>
         {creds.length > 0 && (
           <div className="creds">
-            <b>Send each person their login now — passwords are only shown once.</b>
+            <b>Send each person their login now. These passwords won’t be shown again.</b>
             <pre>{credText}</pre>
             <div className="tools">
               <button className="btn small" type="button" onClick={() => navigator.clipboard.writeText(credText).then(() => setMsg(''), () => {})}>Copy all</button>

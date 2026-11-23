@@ -16,7 +16,7 @@ export async function POST(req) {
     return NextResponse.json({ ok: true });
   }
   const user = await getUser(u);
-  if (!user || !(await bcrypt.compare(String(password), user.hash))) return bad();
+  if (!user || !(await bcrypt.compare(String(password).trim(), user.hash))) return bad();
   await createSession({ username: user.username, role: 'caller', pv: user.pv });
   return NextResponse.json({ ok: true });
 }

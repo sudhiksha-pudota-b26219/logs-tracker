@@ -197,7 +197,7 @@ function PasswordModal({ close, flash }) {
       <form className="box" onSubmit={submit}>
         <h2 style={{ margin: 0 }}>Change password</h2>
         <div><label htmlFor="cp">Current password</label><input id="cp" type="password" autoComplete="current-password" value={cur} onChange={(e) => setCur(e.target.value)} required /></div>
-        <div><label htmlFor="np">New password (6+ characters)</label><input id="np" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} minLength={6} required /></div>
+        <div><label htmlFor="np">New password (4+ characters)</label><input id="np" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} minLength={4} required /></div>
         {err && <p className="err" role="alert">{err}</p>}
         <div className="tools" style={{ margin: 0 }}><button className="btn primary" type="submit">Save</button><button className="btn" type="button" onClick={close}>Cancel</button></div>
       </form>
