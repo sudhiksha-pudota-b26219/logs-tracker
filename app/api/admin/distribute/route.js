@@ -27,7 +27,7 @@ export async function POST(req) {
     for (let j = 0; j < size; j++) {
       const p = list[idx++]; n++;
       const old = previous.get(idOf(p));
-      const st = old && old.status !== 'todo' ? { status: old.status, at: old.at, tries: old.tries || 0, by: old.by } : { status: 'todo', at: null, tries: 0 };
+      const st = old && old.status !== 'todo' ? { status: old.status, at: old.at, tries: old.tries || 0, by: old.by, cbTime: old.cbTime || null, cbNote: old.cbNote || null } : { status: 'todo', at: null, tries: 0 };
       if (old && old.status !== 'todo') kept++;
       contacts['k' + String(n).padStart(4, '0')] = { n, name: p.name, roll: p.roll, ...st };
     }
