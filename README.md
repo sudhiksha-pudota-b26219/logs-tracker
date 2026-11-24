@@ -1,6 +1,6 @@
 # Wake-up Call Tracker
 
-Each caller logs in with their own username and password and sees their own list. For each person they tap **Called**, **Not picked** (or **Not picked again**), or **Undo**. Everyone can see the whole team's progress, and the page refreshes every few seconds. Callers can see other people's lists but can only mark their own. The organiser can mark any list.
+Each caller logs in with their own username and password and sees their own list. For each person they tap **Called**, **Call back**, **Not picked** (or **Not picked again**), or **Undo**. **Call back** is for someone who picked up but asked to be called again: the caller enters the time they asked for and an optional note. These people get their own count and filter, sorted by time, and are highlighted once the time arrives. After calling them again, the caller taps **Called back**. Everyone can see the whole team's progress, and the page refreshes every few seconds. Callers can see other people's lists but can only mark their own. The organiser can mark any list.
 
 ## Deploy on Vercel (about 10 minutes)
 
